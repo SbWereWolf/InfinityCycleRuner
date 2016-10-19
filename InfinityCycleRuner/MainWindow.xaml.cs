@@ -74,6 +74,17 @@
 
         public event MethodContainer OnWeblinkFinish;
         private delegate void WeblinkFinishDelegate();
+        private delegate void AddStringToOutputDelegate(string text );
+
+        private void AddStringToOutput(string someText )
+        {
+            var resultOutputTextBox = this.ResultOutputTextBox;
+
+            if (resultOutputTextBox != null)
+            {
+                resultOutputTextBox.Text += $"{System.Environment.NewLine}{someText}" ;
+            }
+        }
 
         private void WeblinkFinish()
         {
@@ -173,7 +184,7 @@
                 var commandLineText = commandLoopParameters.ExecutableString ;
                 var cooldown = commandLoopParameters.RunCooldown ;
 
-                this.RunCommand
+                MainWindow.RunCommand
                     (
                         commandLineText) ;
 
@@ -186,7 +197,7 @@
                     System.Threading.Thread.Sleep
                         (
                             cooldown * 1000 ) ;
-                    this.RunCommand
+                    MainWindow.RunCommand
                         (
                             commandLineText ) ;
                 }
@@ -196,7 +207,7 @@
             onCommandFinish?.Invoke();
         }
 
-        private void RunCommand
+        private static void RunCommand
             (
             string commandLineText )
         {
@@ -329,9 +340,15 @@
                 cooldown = linkParameters.RunCooldown ;
             }
 
-            MainWindow.DownloadWeblink
+            var linkContent = MainWindow.DownloadWeblink
                 (
                     weblink ) ;
+
+            var addTextCommand = new AddStringToOutputDelegate(this.AddStringToOutput);
+            var dispatcher = this.Dispatcher;
+            dispatcher?.BeginInvoke
+                (
+                    addTextCommand, linkContent);
 
             while ( ( cooldown > 0 )
                     && !this._breakeWeblinkExecution )
@@ -339,9 +356,14 @@
                 System.Threading.Thread.Sleep
                     (
                         cooldown * 1000 ) ;
-                MainWindow.DownloadWeblink
+                linkContent = MainWindow.DownloadWeblink
                     (
                         weblink ) ;
+                dispatcher = this.Dispatcher;
+                dispatcher?.BeginInvoke
+                    (
+                        addTextCommand,
+                        linkContent ) ;
             }
 
             var onWeblinkFinish = linkParameters?.UserInterfaceForm?.OnWeblinkFinish;
