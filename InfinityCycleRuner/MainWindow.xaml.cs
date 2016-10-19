@@ -1,38 +1,23 @@
 ﻿namespace InfinityCycleRuner
 {
 
-    public  class DownloadWebLinkParameters
+    public  class CycleRunParameters
     {
-        public string Weblink { get ; }
-        public int Cooldown { get; }
-        public MainWindow ParentForm { get; }
+        public string ExecutableString { get ; }
+        public int RunCooldown { get; }
+        public MainWindow UserInterfaceForm { get; }
+        public bool LetShowLog { get; }
 
-        public DownloadWebLinkParameters(
-            string weblink
-            , int cooldown
-            , MainWindow parentForm)
+        public CycleRunParameters(
+            string executableString
+            , int runCooldown
+            , MainWindow userInterfaceForm
+            , bool letShowLog)
         {
-            this.Weblink = weblink;
-            this.Cooldown = cooldown ;
-            this.ParentForm = parentForm;
-
-        }
-
-    }
-    public class CommandLoopParameters
-    {
-        public string CommandLineText { get ; }
-        public int Cooldown { get ; }
-        public MainWindow ParentForm { get ; }
-
-        public CommandLoopParameters(
-            string commandLineText 
-            , int cooldown
-            , MainWindow parentForm)
-        {
-            this.CommandLineText = commandLineText ;
-            this.Cooldown = cooldown ;
-            this.ParentForm = parentForm ;
+            this.ExecutableString = executableString;
+            this.RunCooldown = runCooldown ;
+            this.UserInterfaceForm = userInterfaceForm;
+            this.LetShowLog = letShowLog;
 
         }
 
@@ -45,7 +30,9 @@
     {
         private bool _breakeCommandExecution = true;
         private bool _breakeWeblinkExecution = true;
-        
+        private bool _letShowLog = true;
+        private int _cooldown = 0;
+
 
         public delegate void MethodContainer();
 
@@ -120,15 +107,18 @@
         {
             var commandLineText = string.Empty ;
             var cooldown = 0;
+            var letShowLog = false;
 
             var commandTextBox = this.CommandTextBox ;
             var doRunCommandButton = this.DoRunCommandButton;
             var doStopCommandButton = this.DoStopCommandButton;
             var colldownIntegerUpDown = this.CooldownIntegerUpDown;
+            var showLogCheckBox = this.ShowLogCheckBox;
 
             if ( ( commandTextBox != null ) 
                 && ( doRunCommandButton != null )
-                && (doStopCommandButton != null))
+                && (doStopCommandButton != null)
+                && (showLogCheckBox != null))
             {
 
                 doRunCommandButton.IsEnabled = false;
@@ -138,20 +128,25 @@
                 {
                     cooldown = (int)colldownIntegerUpDown.Value;
                 }
+                if (showLogCheckBox.IsChecked != null)
+                {
+                    letShowLog = showLogCheckBox.IsChecked.Value;
+                }
             }
-            
-            CommandLoopParameters commandLoopParameters = null ;
+
+            CycleRunParameters commandLoopParameters = null ;
 
             var parentForm = this ;
 
             if ( !string.IsNullOrWhiteSpace (commandLineText) )
             {
 
-                commandLoopParameters = new CommandLoopParameters
+                commandLoopParameters = new CycleRunParameters
                     (
                     commandLineText ,
                     cooldown ,
-                    parentForm ) ;
+                    parentForm,
+                    letShowLog) ;
             }
 
             if(commandLoopParameters != null )
@@ -171,16 +166,16 @@
             object runCommandLoopParameters )
         {
 
-            var commandLoopParameters = ( CommandLoopParameters ) runCommandLoopParameters ;
+            var commandLoopParameters = (CycleRunParameters) runCommandLoopParameters ;
 
             if ( commandLoopParameters != null )
             {
-                var commandLineText = commandLoopParameters.CommandLineText ;
-                var cooldown = commandLoopParameters.Cooldown ;
+                var commandLineText = commandLoopParameters.ExecutableString ;
+                var cooldown = commandLoopParameters.RunCooldown ;
 
                 this.RunCommand
                     (
-                        commandLoopParameters.CommandLineText ) ;
+                        commandLineText) ;
 
                 // ReSharper disable LoopVariableIsNeverChangedInsideLoop
                 while ( ( cooldown > 0 )
@@ -197,7 +192,7 @@
                 }
             }
 
-            var onCommandFinish = commandLoopParameters?.ParentForm?.OnCommandFinish;
+            var onCommandFinish = commandLoopParameters?.UserInterfaceForm?.OnCommandFinish;
             onCommandFinish?.Invoke();
         }
 
@@ -264,6 +259,7 @@
         {
             var weblink = string.Empty ;
             var cooldown = 0 ;
+            var letShowLog = false;
 
             var doDownloadWeblinkButton = this.DoDownloadWeblinkButton ;
             var doGetWeblinkButton = this.DoGetWeblinkButton;
@@ -271,11 +267,13 @@
             var doStopWebLinkButton = this.DoStopWebLinkButton;
             var weblinkTextBox = this.WeblinkTextBox ;
             var colldownIntegerUpDown = this.CooldownIntegerUpDown;
+            var showLogCheckBox = this.ShowLogCheckBox ;
             if (( weblinkTextBox!= null ) 
                 && ( doDownloadWeblinkButton != null )
                 && ( doGetWeblinkButton != null )
                 && ( doPostWeblinkButton != null ) 
-                && ( doStopWebLinkButton != null ) )
+                && ( doStopWebLinkButton != null ) 
+                && (showLogCheckBox != null ) )
             {
                 doDownloadWeblinkButton.IsEnabled = false ;
                 doGetWeblinkButton.IsEnabled = false;
@@ -286,26 +284,31 @@
                 {
                     cooldown = (int)colldownIntegerUpDown.Value;
                 }
+                if ( showLogCheckBox.IsChecked != null )
+                {
+                    letShowLog = showLogCheckBox.IsChecked.Value;
+                }
             }
 
-            DownloadWebLinkParameters downloadWebLinkParameters = null ;
+            CycleRunParameters cycleRunParameters = null ;
             if ( !string.IsNullOrWhiteSpace ( weblink ))
             {
-                downloadWebLinkParameters = new DownloadWebLinkParameters 
+                cycleRunParameters = new CycleRunParameters 
                     (
                     weblink,
                     cooldown,
-                    this
+                    this,
+                    letShowLog
                     );
             }
 
-            if (downloadWebLinkParameters != null)
+            if (cycleRunParameters != null)
             {
 
                 this._breakeWeblinkExecution = false;
 
                 var runWeblinkLoopThread = new System.Threading.Thread(this.RunDownloadWebLink);
-                runWeblinkLoopThread.Start(downloadWebLinkParameters);
+                runWeblinkLoopThread.Start(cycleRunParameters);
             }
 
         }
@@ -318,12 +321,12 @@
             var weblink = string.Empty ;
             var cooldown = 0 ;
 
-            var linkParameters = ( DownloadWebLinkParameters ) webLinkParameters ;
+            var linkParameters = ( CycleRunParameters ) webLinkParameters ;
 
             if ( linkParameters != null )
             {
-                weblink = linkParameters.Weblink ;
-                cooldown = linkParameters.Cooldown ;
+                weblink = linkParameters.ExecutableString ;
+                cooldown = linkParameters.RunCooldown ;
             }
 
             MainWindow.DownloadWeblink
@@ -341,7 +344,7 @@
                         weblink ) ;
             }
 
-            var onWeblinkFinish = linkParameters?.ParentForm?.OnWeblinkFinish;
+            var onWeblinkFinish = linkParameters?.UserInterfaceForm?.OnWeblinkFinish;
             onWeblinkFinish?.Invoke();
         }
 
@@ -385,6 +388,26 @@
         private void DoStopWebLinkButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             this._breakeWeblinkExecution = true;
+        }
+
+        private void ShowLogCheckBox_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            this._letShowLog = true;
+        }
+
+        private void ShowLogCheckBox_Unchecked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            this._letShowLog = false;
+        }
+
+        private void CooldownIntegerUpDown_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<object> e)
+        {
+            this._cooldown = 0;
+            var cooldownIntegerUpDown = this.CooldownIntegerUpDown ;
+            if ( cooldownIntegerUpDown?.Value != null )
+            {
+                this._cooldown = cooldownIntegerUpDown.Value.Value;
+            }
         }
     }
 }

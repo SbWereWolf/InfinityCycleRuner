@@ -16,9 +16,9 @@
         <Button x:Name="DoStopWebLinkButton" Content="STOP" HorizontalAlignment="Left" Margin="643,200,0,0" VerticalAlignment="Top" Width="136" Height="39" IsEnabled="False" Click="DoStopWebLinkButton_Click"/>
         <Button x:Name="DoGetWeblinkButton" Content="GET" HorizontalAlignment="Left" Margin="151,200,0,0" VerticalAlignment="Top" Width="136" Height="39" Click="DoGetWeblinkButton_Click"/>
         <TextBox x:Name="ResultOutputTextBox" HorizontalAlignment="Left" Height="274" Margin="10,283,0,0" TextWrapping="Wrap" Text="Output" VerticalAlignment="Top" Width="769" HorizontalContentAlignment="Stretch"/>
-        <CheckBox x:Name="ShowOutputCheckBox" Content="Show output" HorizontalAlignment="Left" Margin="13,250,0,0" VerticalAlignment="Top" Height="28" Width="133"/>
+        <CheckBox x:Name="ShowLogCheckBox" Content="Show log" HorizontalAlignment="Left" Margin="13,250,0,0" VerticalAlignment="Top" Height="28" Width="133" Checked="ShowLogCheckBox_Checked" Unchecked="ShowLogCheckBox_Unchecked"/>
         <Button x:Name="DoDownloadWeblinkButton" Content="DOWNLOAD" HorizontalAlignment="Left" Margin="292,200,0,0" VerticalAlignment="Top" Width="136" Height="39" Click="DoDownloadWeblinkButton_Click" />
-        <xctk:IntegerUpDown x:Name="CooldownIntegerUpDown" Text="0" Margin="220,7.443,435.8,521.757" MinWidth="30" MinHeight="30" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Minimum="0" Maximum="2678400" Increment="10" ParsingNumberStyle="Integer" Value="0" DefaultValue="20" DisplayDefaultValueOnEmptyText="True" UpdateValueOnEnterKey="True" FontSize="24" FontFamily="Courier New" UseLayoutRounding="False"/>
-        <TextBlock x:Name="CooldownTextBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Cooldown in seconds" VerticalAlignment="Top" Height="38" Width="205" FontSize="18"/>
+        <xctk:IntegerUpDown x:Name="CooldownIntegerUpDown" Text="0" Margin="220,7.443,435.8,521.757" MinWidth="30" MinHeight="30" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Minimum="0" Maximum="2678400" Increment="10" ParsingNumberStyle="Integer" Value="0" DefaultValue="20" DisplayDefaultValueOnEmptyText="True" UpdateValueOnEnterKey="True" FontSize="24" FontFamily="Courier New" UseLayoutRounding="False" ValueChanged="CooldownIntegerUpDown_ValueChanged"/>
+        <TextBlock x:Name="CooldownTextBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="RunCooldown in seconds" VerticalAlignment="Top" Height="38" Width="205" FontSize="18"/>
     </Grid>
 </Window>
